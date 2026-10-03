@@ -20,15 +20,17 @@ CONTENTS
 
 ---
 
-packaging-line-simulation/
-|-- README.txt
-|-- requirements.txt
-|-- .gitignore
-|-- 01_simulate_line.py     Lesson 1: fixed times, no breakdowns
-|-- 02_random_line.py       Lesson 2: random times, breakdowns, buffer sizes
-|-- line_model.py           Reusable model (used by 03 and the validator)
-|-- 03_report.py            Bottleneck detection + Excel report with charts
-`-- validator.py            Independent checks on the model’s output
+packaging-line-simulation:
+
+1. README.txt
+
+2.requirements.txt
+3..gitignore
+4. 01_simulate_line.py (Lesson 1: fixed times, no breakdowns)
+5. 02_random_line.py    (Lesson 2: random times, breakdowns, buffer sizes)
+6. line_model.py         ( Reusable model (used by 03 and the validator))
+6. 03_report.py         ( Bottleneck detection + Excel report with charts)
+7.validator.py            (Independent checks on the model’s output)
 
 1. HOW TO RUN
 
