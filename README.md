@@ -1,77 +1,120 @@
-Packaging Line Simulation
+PACKAGING LINE SIMULATION
 
-A discrete-event simulation of a 5-station packaging line (filling, capping, labeling, sealing, carton), built step by step with Python and SimPy. It finds the bottleneck, shows how each station spends its time, and tests how buffer size affects output.
+A discrete-event simulation of a 5-station packaging line, built with
+Python and SimPy. It finds the bottleneck, shows how each station spends
+its time, and tests how buffer size affects output.
 
-All data is simulated. The line is generic: it could be a food, drink, cosmetics, or pharmaceutical line.
+All data is simulated. The line is generic: it could be a food, drink,
+cosmetics or pharmaceutical line.
 
-The model
+CONTENTS
 
-* 5 stations in a row, with a buffer (waiting area) between each pair.
-* The first station always has material. The last station’s output leaves the line.
-* A station is blocked when the buffer after it is full, and starved when the buffer before it is empty.
-* Processing times are random (10% variation around each station’s average).
-* Stations break down after about 600 working seconds on average and need about 60 seconds of repair. A breakdown can happen in the middle of a unit.
-* Every second of a station’s time is counted as one of four states: busy, down, blocked, starved.
+1. Project structure
+2. How to run
+3. How the model works
+4. Output
+5. Validator
+6. Limitations
+7. Requirements and license
+8. PROJECT STRUCTURE
 
-Files
+---
 
-Column 1	Column 2
-File	What it does
-01_simulate_line.py	Lesson 1: fixed processing times, no breakdowns
-02_random_line.py	Lesson 2: random times and breakdowns, buffer size comparison
-line_model.py	The reusable simulation model used by the report and the validator
-03_report.py	Bottleneck detection and an Excel report with charts
-validator.py	Independent checks on the model’s output
+packaging-line-simulation/
+|-- README.txt
+|-- requirements.txt
+|-- .gitignore
+|-- 01_simulate_line.py     Lesson 1: fixed times, no breakdowns
+|-- 02_random_line.py       Lesson 2: random times, breakdowns, buffer sizes
+|-- line_model.py           Reusable model (used by 03 and the validator)
+|-- 03_report.py            Bottleneck detection + Excel report with charts
+`-- validator.py            Independent checks on the model’s output
 
-
-Run it
-
-pip install -r requirements.txt
-python 01_simulate_line.py
-python 02_random_line.py
-python 03_report.py
-python validator.py
-
-validator.py runs about 35 simulations, so it takes a little while.
-
-Output
-
-03_report.py writes packaging_report.xlsx:
-
-Column 1	Column 2
-Sheet	Content
-KPIs	Throughput, flow time, bottleneck(s), number of tied stations
-Stations	Busy, down, blocked and starved percentage per station, with a stacked bar chart
-Buffer study	Throughput and flow time for buffer sizes 1 to 20, with line charts
+1. HOW TO RUN
 
 
-If several stations have the same slowest process time, the report lists all of them as tied bottlenecks, instead of picking one at random.
+Step 1   pip install -r requirements.txt
+Step 2   python 01_simulate_line.py     (simple line, prints results)
+Step 3   python 02_random_line.py       (adds randomness and breakdowns)
+Step 4   python 03_report.py            (writes packaging_report.xlsx)
+Step 5   python validator.py            (runs about 35 simulations)
 
-Validator
+Close packaging_report.xlsx before step 4, or Python cannot save over it.
 
-validator.py checks things that must be true whatever the random numbers are:
+1. HOW THE MODEL WORKS
 
-* Each station’s four states add up to about 100% of the time.
-* The first station is never starved, and the last is never blocked.
-* Throughput never exceeds 3600 divided by the slowest station’s time.
-* With no randomness and no breakdowns, the result matches the hand calculation.
-* The same seed gives the same result.
-* Breakdowns lower throughput, and the repair share matches the settings.
-* A bigger buffer does not reduce throughput.
 
-These checks are written for long runs (the default is 100,000 simulated seconds). Very short runs fail some of them because of start-up and end-of-run effects and too few breakdowns, not because the model is wrong.
+Line
 
-Limitations
+* 5 stations in a row: Filling, Capping, Labeling, Sealing, Carton.
+* A buffer (waiting area) sits between each pair of stations.
+* The first station always has material. The last station’s output
+leaves the line.
 
-* Breakdowns happen only while a station is processing. A blocked or starved station cannot fail.
-* Buffers have the same size everywhere, and repair times are random but have no maintenance schedule.
-* Waits and repairs still in progress when the simulation stops are not counted, which is why the time totals can be slightly under 100%.
+Station states (every second is counted as exactly one of these)
+
+* Busy      processing a unit
+* Down      being repaired
+* Blocked finished a unit, but the buffer after it is full.
+* Starved   waiting for a unit, because the buffer before it is empty
+
+Randomness
+
+* Processing times vary by 10% around each station’s average.
+* A station breaks down after about 600 working seconds on average and
+needs about 60 seconds of repair. A breakdown can happen in the
+middle of a unit.
+1. OUTPUT
+
+
+
+03_report.py writes packaging_report.xlsx with three sheets:
+
+KPIs           Throughput, flow time, bottleneck(s), number of tied
+stations
+Stations       Busy / down / blocked / starved % per station, with a
+stacked bar chart
+Buffer study   Throughput and flow time for buffer sizes 1 to 20, with
+line charts
+
+Ties: if several stations have the same slowest process time, the report
+lists all of them as tied bottlenecks instead of picking one at random.
+
+1. VALIDATOR
+
+
+validator.py checks things that must be true whatever the random numbers
+are:
+
+[1] Each station’s four states add up to about 100% of the time.
+[2] The first station is never starved; the last is never blocked.
+[3] Throughput never exceeds 3600 / (slowest station’s time).
+[4] With no randomness and no breakdowns, the result matches the hand
+calculation.
+[5] The same seed gives the same result.
+[6] Breakdowns lower throughput.
+[7] The repair share matches the breakdown settings.
+[8] A bigger buffer does not reduce throughput.
+
+Note: the checks are written for long runs (default 100,000 simulated
+seconds). Very short runs fail some of them because of start-up and
+end-of-run effects and too few breakdowns, not because the model is wrong.
+
+1. LIMITATIONS
+
+
+
+* Breakdowns happen only while a station is processing. A blocked or
+starved station cannot fail.
+* All buffers have the same size. Repairs are random, with no
+maintenance schedule.
+* Waits and repairs still running when the simulation stops are not
+counted, so time totals can be slightly under 100%.
 * Single product, simulated data, no operators or material shortages.
+1. REQUIREMENTS AND LICENSE
 
-Requirements
 
-Python 3.9+, simpy, pandas, openpyxl (see requirements.txt).
 
-License
-
-MIT
+Requirements   Python 3.9+, simpy, pandas, openpyxl
+(see requirements.txt)
+License        MIT
